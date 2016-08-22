@@ -1,0 +1,405 @@
+    
+    
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    <html>
+    
+    <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"></script>
+    <script src="ngStorage.min.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Chest Decriptor - Clash Royale</title>
+    </head>
+    
+    <body>
+    <div id="main">
+    <h2 >Chest Decriptor
+    <div id="header">
+    
+    </div>
+    
+    
+    
+    <div ng-app="myApp" ng-controller="myCtrl"> 
+    
+    
+    
+    <style type="text/css">
+    .tg  {border-collapse:collapse;border-spacing:0;}
+    .tg td{font-family:Arial, sans-serif;font-size:14px;padding:3px 3px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+    .tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;}
+    .tg .tg-yw4l{vertical-align:top}
+    </style>
+    
+    <table class="tg" style="width: 100%;border: 0;">
+    <tr>
+    
+    <th class="tg-yw4l">
+    
+    <table>
+    <caption>Common Cards</caption>
+    <tr>
+    <th>Soltas</th>
+    <th>Nível</th>
+    <th>Carta</th>
+    <th>Totais</th>
+    </tr>
+    <tr ng-repeat="card in common_cards">
+    <td><input type="text" ng-model="common_soltas[$index]"  style="width: 20px";></td>
+    <td><input type="text" ng-model="common_nivel[$index]"  style="width: 20px";></td>
+    
+    <td>{{card.idName}}</td>
+    <td>{{totais_comuns[$index]}}</label></td><!-- $index é referente ao repeat -->
+    
+    </tr>
+    </table>
+    
+    
+    
+    
+    <th class="tg-yw4l">
+    
+    <table>
+    <caption>Rare Cards</caption>
+    <tr>
+    <th>Soltas</th>
+    <th>Nível</th>
+    <th>Carta</th>
+    <th>Totais</th>
+    </tr>
+    <tr ng-repeat="card in rare_cards">
+    <td><input type="text" ng-model="rare_soltas[$index]" ng-init="rare_soltas[$index]=0" style="width: 20px";></td>
+    
+    
+    <td><input type="text" ng-model="rare_nivel[$index]"  ng-init="rare_nivel[$index]=1" style="width: 20px";></td>
+    
+    <td>{{card.idName}}</td>
+    <td>{{totais_raras[$index]}}</label></td><!-- $index é referente ao repeat -->
+    
+    </tr>
+    </table>
+    
+    </th>
+    </th>
+    
+    
+    
+    
+    
+    <th class="tg-yw4l">
+    <table>
+    <caption>Epic Cards</caption>
+    <tr>
+    <th>Soltas</th>
+    <th>Nível</th>
+    <th>Carta</th>
+    <th>Totais</th>
+    
+    </tr>
+    <tr ng-repeat="card in epic_cards">
+    <td><input type="text" ng-model="epic_soltas[$index]" ng-init="epic_soltas[$index]=0" style="width: 20px";></td>
+    
+    
+    <td><input type="text" ng-model="epic_nivel[$index]"  ng-init="epic_nivel[$index]=1" style="width: 20px";></td>
+    
+    <td>{{card.idName}}</td>
+    <td>{{totais_epicas[$index]}}</label></td><!-- $index é referente ao repeat -->
+    
+    </tr>
+    </table>
+    
+    </th>
+    </tr>
+    
+    </table>
+   
+    <table style="width: 100%;border: 0; font-family:Arial, sans-serif;font-size:14px;" >
+    <tr>
+    <td style="width: 40%;">
+    <h6>Notas: Valores inseridos guardados após fechar browser  e previsão escrita. - Apenas Comuns
+	<p>Adicionar previsão para 2º e 3º mais baixa nos totais.
+	<p>Meter nivel 10 nas cartas que não possuem.</h6>
+    <button type="button" ng-click="saveAllValues()">Compute</button>
+    <h4 align="left">Próxima comum a sair: {{LowestCommon}}
+    <p>Próxima rara a sair:{{LowestRare}}
+    <p>Próxima épica a sair:{{LowestEpic}}</h6>
+    </td>
+    
+    
+    <td>
+    <h5> Esta página tem como objetivo prever as cartas que saem nos báus a abrir do jogo Clash Royale. 
+    <p>O algoritmo implementado pela SuperCell para distribuição de cartas pelos báus funciona de maneira a nivelar o número total de cartas primeiro, impedindo assim a evolução de um só tipo de carta. Supostamente esta distribuição é aleatória, daí o estudo destes dados. 
+    As conclus�es que tirei at� agora � que isto acontece com mais frequencia mas cartas comuns.
+    
+   </h5>
+    </td>
+    </tr>
+    </div>
+    
+    
+    <!-- Please leave the link(s) in the footer, but please do modify it in any other way you please -->
+    
+    
+    <script>
+    var app = angular.module('myApp', ["ngStorage"]);
+    
+    
+    app.controller('myCtrl', function($scope, $http, $localStorage) {
+    
+    var flag=0;
+    var c_counter=0;
+    
+    
+    $scope.common_soltas =[];
+    $scope.cards = [];
+    
+    
+    $scope.common_cards = [];
+    $scope.rare_cards = [];
+    $scope.epic_cards = [];
+    
+    
+    
+    $scope.common_nivel = [];
+    $scope.rare_soltas = [];
+    $scope.rare_nivel = [];
+    $scope.epic_soltas = [];
+    $scope.epic_nivel = [];
+    
+    
+    
+    
+    if (typeof ($localStorage.common_soltas && $localStorage.common_nivel) == 'undefined') { //Verifica se já existe informação sobre este objeto no LocalStorage
+    
+    $localStorage.common_soltas=[];
+    $localStorage.common_nivel=[];
+    flag=1;
+    }
+    
+    
+    
+    
+    $http.get("https://clash-royale.herokuapp.com/api/cards")
+    .then(function(response) {
+    
+    $scope.cards=response.data;
+    
+    
+    
+    for(var i = 0; i < $scope.cards.length; i++) {
+    
+    if ($scope.cards[i].rarity=="Common"){
+    $scope.common_cards.push($scope.cards[i]);
+    if (flag==1)
+    {$localStorage.common_soltas.push(0);
+    $localStorage.common_nivel.push(1);
+    }
+    
+    }
+    
+    if ($scope.cards[i].rarity=="Rare")
+    $scope.rare_cards.push($scope.cards[i]);
+    
+    if ($scope.cards[i].rarity=="Epic")
+    $scope.epic_cards.push($scope.cards[i]);
+    
+    
+    }
+    
+    
+    $scope.common_soltas = $localStorage.common_soltas;
+    $scope.common_nivel = $localStorage.common_nivel;
+    
+    });
+    
+    $scope.saveAllValues = function() {
+    compute_totais_comuns($scope);
+    compute_totais_epicas($scope);
+    compute_totais_raras($scope);
+    
+    $scope.save();
+    
+    }
+    
+    
+    
+    $scope.save = function() {
+    $localStorage.common_soltas = $scope.common_soltas;
+      $localStorage.common_nivel = $scope.common_nivel;
+
+}
+
+
+
+});
+
+
+
+
+
+
+
+
+///// Juntar as 3 funções seguintes e passar diferenças por arg
+
+function compute_totais_raras($scope)
+{
+
+
+var cards_per_lvl=[1,2,4,10,20,50,100,200,400,800,1000,2000,5000];
+
+$scope.totais_raras=[];
+
+var soma;
+var soltas;
+for(var d=0;d<$scope.rare_cards.length;d++)	{ // percorre todas as input box 
+soma=0;
+soltas=0;
+for(var c=0;c<$scope.rare_nivel[d];c++)  // Soma nºde cartas até nivel introduzido - 1
+{
+
+soltas=parseInt($scope.rare_soltas[d]);
+soma=soma+cards_per_lvl[c];
+
+}
+soma=soma+soltas;
+$scope.totais_raras.push(soma);
+}
+
+get_lowest_rare($scope);
+
+return;//<-- same as return undefined
+}
+
+
+
+
+function compute_totais_epicas($scope)
+{
+
+
+var cards_per_lvl=[1,2,4,10,20,50,100,200,400,800,1000,2000,5000];
+
+$scope.totais_epicas=[];
+
+var soma;
+var soltas;
+for(var d=0;d<$scope.epic_cards.length;d++)	{ // percorre todas as input box 
+soma=0;
+soltas=0;
+for(var c=0;c<$scope.epic_nivel[d];c++)  // Soma nºde cartas até nivel introduzido - 1
+{
+
+soltas=parseInt($scope.epic_soltas[d]);
+soma=soma+cards_per_lvl[c];
+
+}
+soma=soma+soltas;
+$scope.totais_epicas.push(soma);
+}
+
+get_lowest_epic($scope);
+
+return;//<-- same as return undefined
+}
+
+
+function compute_totais_comuns($scope)
+{
+
+
+var cards_per_lvl=[1,2,4,10,20,50,100,200,400,800,1000,2000,5000];
+
+$scope.totais_comuns=[];
+
+var soma;
+var soltas;
+for(var d=0;d<$scope.common_cards.length;d++)	{ // percorre todas as input box 
+soma=0;
+soltas=0;
+for(var c=0;c<$scope.common_nivel[d];c++)  // Soma nºde cartas até nivel introduzido - 1
+{
+
+soltas=parseInt($scope.common_soltas[d]);
+soma=soma+cards_per_lvl[c];
+
+}
+soma=soma+soltas;
+$scope.totais_comuns.push(soma);
+}
+
+
+get_lowest_common($scope);
+
+return;//<-- same as return undefined
+}
+
+
+///// Juntar as 3 funções seguintes e passar diferenças por arg
+
+function get_lowest_common($scope){
+
+
+
+var smallest = $scope.totais_comuns[0];
+var id=[];
+
+for(var d=1;d<$scope.totais_comuns.length;d++){
+if($scope.totais_comuns[d] <= smallest){
+        smallest = $scope.totais_comuns[d];  
+         id.push(d);
+    }
+
+}
+
+
+$scope.LowestCommon=$scope.common_cards[id[0]].idName;;
+for(var t=1;t<id.length;t++)
+$scope.LowestCommon=$scope.LowestCommon +", "+ $scope.common_cards[id[t]].idName;
+}
+
+
+
+
+function get_lowest_rare($scope){
+
+
+var low=100000;
+var low2=100000;
+var id;
+for(var d=0;d<$scope.totais_raras.length;d++){
+
+if($scope.totais_raras[d]<low )
+low=$scope.totais_raras[d];
+id=d;
+}
+
+$scope.LowestRare=$scope.rare_cards[id].idName;
+}
+
+
+
+
+
+function get_lowest_epic($scope){
+
+
+var low=100000;
+var low2=100000;
+var id;
+for(var d=0;d<$scope.totais_epicas.length;d++){
+
+if($scope.totais_epicas[d]<low )
+low=$scope.totais_epicas[d];
+id=d;
+}
+
+$scope.LowestEpic=$scope.epic_cards[id].idName;
+}
+
+</script>
+
+
+
+</body>
+</html>

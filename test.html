@@ -1,0 +1,147 @@
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    <html>
+    
+    <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"></script>
+    <script src="ngStorage.min.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Chest Decriptor - Clash Royale</title>
+    </head>
+    
+    <body>
+    <div id="main">
+    <h2 >Chest Decriptor
+    <div id="header">
+    
+    </div>
+	
+	
+	<div ng-app="myApp" ng-controller="myCtrl"> 
+
+	
+	
+	 <select ng-model="selected" ng-options="item.title for item in fieldTable" ng-change="hasChanged()">           
+    </select>
+	<table class="tg" style="width: 100%;border: 0;">
+    <tr>
+    
+    <th class="tg-yw4l">
+    
+    <table >
+    <caption>Test</caption>
+ <tr>
+    <td ng-repeat="x in table1">
+
+   <h5 style="font-family: Tahoma;font-size: 5px;color: #ff0000;">{{x.CandyToEvolve}}
+
+  
+	
+       <!-- meter tabela aqui para meter os stats -->
+
+   
+    </td>
+	</tr>
+	<tr>
+	
+	
+	 <td ng-repeat="x in table2">
+
+   <h5 style="font-family: Tahoma;font-size: 5px;color: #ff0000;">{{x.UniqueId}}
+
+  
+	
+       <!-- meter tabela aqui para meter os stats -->
+
+   
+    </td>
+	
+	
+	
+	</tr>
+    </table>
+	
+	</div>
+	
+	
+	 <script>
+    var app = angular.module('myApp', ["ngStorage"]);
+    
+    
+    app.controller('myCtrl', function($scope, $http, $localStorage) {
+    $scope.fieldTable = [{
+    field: "text",
+    title: "Global"
+  }, {
+    field: "relatedentity",
+    title: "Entity"
+  }, {
+    field: "title",
+    title: "Title"
+  }, {
+    field: "content",
+    title: "Content"
+  }];
+
+   $scope.selected = $scope.fieldTable[0];
+	
+
+ $scope.pokemon_array = [];
+    
+
+	
+	$http.get('GAME_MASTER_v0_1.json').success(function(data) {
+   $scope.phones = data;
+   
+   
+  for (var i=0;i<500;i++){
+  if ($scope.phones.Items[i].Pokemon!=undefined)
+    $scope.pokemon_array.push($scope.phones.Items[i].Pokemon);
+
+   
+   }
+   
+   
+   // Mudar estes valores para o ng-init atraves do index...
+   $scope.table1 =  $scope.pokemon_array.slice(0, 14);
+   $scope.table2 = $scope.pokemon_array.slice(15, 29);
+  $scope.table3 =  $scope.pokemon_array.slice(30, 44);
+   $scope.table4 =  $scope.pokemon_array.slice(45, 59);
+$scope.table5 =  $scope.pokemon_array.slice(60, 74);
+$scope.table6 =  $scope.pokemon_array.slice(75, 89);
+$scope.table7 =  $scope.pokemon_array.slice(90, 104);
+$scope.table8 =  $scope.pokemon_array.slice(105, 119);
+ $scope.table9 =  $scope.pokemon_array.slice(120, 134);
+$scope.table10 =  $scope.pokemon_array.slice(135, 149);
+   
+   
+   
+   
+
+
+});
+	
+	
+
+
+  $scope.hasChanged = function() {
+  if ($scope.selected.title=="Entity"){
+  console.log($scope.pokemon_array[17].CandyToEvolve);
+  /*.sort(function(obj1, obj2) {
+	// Ascending: first age less than the previous
+	return obj1.age - obj2.age;*/
+//});
+
+}
+  }
+	
+    });
+    
+    
+    
+
+
+</script>
+	
+</body>
+</html>
